@@ -1,24 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
 <head>
 
   <meta charset="UTF-8">
-  
+
   <title>Drawn Apart - Offscreen Demo</title>
 </head>
 
-<body translate="no" >
-<h1>Drawn Apart - Offscreen Demo (Chromium-based browsers only)</h1>
-For more info: see <a href="https://github.com/drawnapart/drawnapart">https://github.com/drawnapart/drawnapart</a>
-<br>
-<br>
-<button onclick="again()">Relaunch!</button>
-<button onclick=" window.open('https://github.com/drawnapart/drawnapart/blob/master/standalone_demos/offscreen.html','_blank')"> View source code</button>
-<pre id="results"></pre>
-<!--<canvas id="myCanvas"></canvas>-->
+<body translate="no">
+  <h1>Drawn Apart - Offscreen Demo (Chromium-based browsers only)</h1>
+  For more info: see <a href="https://github.com/drawnapart/drawnapart">https://github.com/drawnapart/drawnapart</a>
+  <br>
+  <br>
+  <button onclick="again()">Relaunch!</button>
+  <button
+    onclick=" window.open('https://github.com/drawnapart/drawnapart/blob/master/standalone_demos/offscreen.html','_blank')">
+    View source code</button>
+  <pre id="results"></pre>
+  <!--<canvas id="myCanvas"></canvas>-->
 
-<script id="workerSource" type="javascript/worker">
+  <script id="workerSource" type="javascript/worker">
   var stallVertexIdLocation, gl, offscreenCan;
   var numOfVertices = 7;
   
@@ -159,44 +161,62 @@ async function measureVertex(gl, vertexIndex) {
   }
  
 </script>
-  
-  
-      <script id="rendered-js" >
-var myWorker;
-
-//window.onload = prepareAndGo;
-window.onload = mainWithThreads;
-
-function again() {
-  myWorker.postMessage("go!");
-}
 
 
-function handleMessageFromWorker(msg) {
-  // put the data in the result div
-  console.log(msg.data);
-  document.getElementById("results").innerText = msg.data;
-}
+  <script id="rendered-js">
+    var myWorker;
+    var test_num = 0
 
-function mainWithThreads() {
-  // Create the thread
-  var blob = new Blob([
-    document.querySelector('#workerSource').textContent
-  ], { type: "text/javascript" })
-  myWorker = new Worker(window.URL.createObjectURL(blob));
-  
-  myWorker.addEventListener('message', handleMessageFromWorker);
-  
-  // Tell the worker to start.
-  myWorker.postMessage("prepare and go!");
+    //window.onload = prepareAndGo;
+    window.onload = mainWithThreads;
+
+    function again() {
+      myWorker.postMessage("go!");
+    }
 
 
-}
-    </script>
+    function handleMessageFromWorker(msg) {
+      // put the data in the result div
+      document.getElementById("results").innerText = msg.data;
 
-  
+      // Convert the string to a Blob.
+      const data = new Blob([msg.data], { type: 'text/plain' });
+
+      // Create an anchor element and dispatch a click event on it
+      // to trigger a download
+      let a = document.createElement('a');
+      a.href = window.URL.createObjectURL(data);
+      a.download = "test" + test_num.toString() + ".txt"; // specify the file name here
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      test_num += 1
+
+      console.log("Test: " + test_num.toString() + " Complete");
+
+      if (test_num < 6000) {
+        again()
+      }
+    }
+
+    function mainWithThreads() {
+      // Create the thread
+      var blob = new Blob([
+        document.querySelector('#workerSource').textContent
+      ], { type: "text/javascript" })
+      myWorker = new Worker(window.URL.createObjectURL(blob));
+
+      myWorker.addEventListener('message', handleMessageFromWorker);
+
+      // Tell the worker to start.
+      myWorker.postMessage("prepare and go!");
+
+
+    }
+  </script>
+
+
 
 </body>
 
 </html>
- 
