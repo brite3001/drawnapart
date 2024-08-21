@@ -139,13 +139,10 @@ async function measureVertex(gl, vertexIndex) {
     var endTime = performance.now();
 
     resultString = "";
-    resultString += "Trace:\n";
 
     for(let i = 0; i<tracesConvertToBlob.length; i++){
       resultString += tracesConvertToBlob[i].performanceNow.toFixed(3) + "\n";
     }
-
-    resultString += "Total time for fingerprint: " + (endTime - startTime).toFixed(3) +  " ms";
     return resultString;
   }
 
