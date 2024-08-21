@@ -165,7 +165,6 @@ async function measureVertex(gl, vertexIndex) {
 
   <script id="rendered-js">
     var myWorker;
-    var test_num = 0
 
     //window.onload = prepareAndGo;
     window.onload = mainWithThreads;
@@ -184,19 +183,31 @@ async function measureVertex(gl, vertexIndex) {
 
       // Create an anchor element and dispatch a click event on it
       // to trigger a download
-      let a = document.createElement('a');
-      a.href = window.URL.createObjectURL(data);
-      a.download = "test" + test_num.toString() + ".txt"; // specify the file name here
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      test_num += 1
+      // let a = document.createElement('a');
+      // a.href = window.URL.createObjectURL(data);
+      // a.download = "test" + test_num.toString() + ".txt"; // specify the file name here
+      // document.body.appendChild(a);
+      // a.click();
+      // document.body.removeChild(a);
+      // test_num += 1
 
-      console.log("Test: " + test_num.toString() + " Complete");
+      const formData = new FormData();
+      formData.append('file', data);
 
-      if (test_num < 6000) {
-        again()
-      }
+      fetch('http://localhost:8000/uploadfile', { // Replace with your backend endpoint URL
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+
+      console.log("Test Complete");
+
+      again()
+
     }
 
     function mainWithThreads() {
