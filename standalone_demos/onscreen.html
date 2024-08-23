@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
 <head>
 
   <meta charset="UTF-8">
-  
+
   <title>Drawn Apart - Onscreen Demo</title>
 </head>
 
-<body translate="no" >
-<h1>Drawn Apart - Onscreen Demo</h1>
-For more info: see <a href="https://github.com/drawnapart/drawnapart">https://github.com/drawnapart/drawnapart</a>
-<br>
-<br>
-<button onclick="again()">Relaunch!</button>
-<button onclick=" window.open('https://github.com/drawnapart/drawnapart/blob/master/standalone_demos/onscreen.html','_blank')"> View source code</button>
-<pre id="results"></pre>
-<canvas id="myCanvas"></canvas>
+<body translate="no">
+  <h1>Drawn Apart - Onscreen Demo</h1>
+  For more info: see <a href="https://github.com/drawnapart/drawnapart">https://github.com/drawnapart/drawnapart</a>
+  <br>
+  <br>
+  <button onclick="again()">Relaunch!</button>
+  <button
+    onclick=" window.open('https://github.com/drawnapart/drawnapart/blob/master/standalone_demos/onscreen.html','_blank')">
+    View source code</button>
+  <pre id="results"></pre>
+  <canvas id="myCanvas"></canvas>
 
-<script>
-var stallVertexIdLocation, gl;
-  var numOfVertices = 7;
-  
+  <script>
+    var stallVertexIdLocation, gl;
+    var numOfVertices = 100;
 
-  // DRAWNAPART code here
-const fragment_code = 
-  `#version 300 es
+
+    // DRAWNAPART code here
+    const fragment_code =
+      `#version 300 es
     precision mediump float;
     out vec4 outColor;
     
@@ -35,8 +37,8 @@ const fragment_code =
     }
     `;
 
-const vertex_code = 
-  `#version 300 es
+    const vertex_code =
+      `#version 300 es
   uniform int cur_stalled_vertex;
 
     float stall_function()
@@ -63,111 +65,127 @@ const vertex_code =
     }
     `;
 
-function awaitAnimationFrame() {
-    let resolve = null;
-    const promise = new Promise(r => resolve = r);
-    window.requestAnimationFrame(resolve);
-    return promise;
-}
-    
-
-async function measureVertex(gl, vertexIndex) {
-  // Configure the stalled vertex index
-  gl.uniform1i(stallVertexIdLocation, vertexIndex);
-  gl.drawArrays(gl.POINTS, 0, numOfVertices);
-
-
-  // Measure time
-  var beforeRender = performance.now();
-  await awaitAnimationFrame();
-  var afterRender = performance.now();
-
-  return {performanceNow: afterRender - beforeRender};
-}
-
-
-
-  async function prepareAndGo() {
-    // Initalize the offscreen canvas
-    gl = document.getElementById('myCanvas').getContext("webgl2", {antialias: false});
-
-
-    // Prepare to draw
-    prepareToDraw(gl, numOfVertices);
-
-    // Draw!
-    return go(gl);
-    
-  }
-  
-  function prepareToDraw(gl, vertexCount) {
-
-  var vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, vertex_code);
-  gl.compileShader(vertShader);
-  var compiled = gl.getShaderParameter(vertShader, gl.COMPILE_STATUS);
-  if (!compiled) {
-    console.error(gl.getShaderInfoLog(vertShader));
-  }
-
-  // Fragment shader
-  var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, fragment_code);
-  gl.compileShader(fragShader);
-  compiled = gl.getShaderParameter(fragShader, gl.COMPILE_STATUS);
-  if (!compiled) {
-    console.error(gl.getShaderInfoLog(fragShader));
-  }
-
-  var shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertShader);
-  gl.attachShader(shaderProgram, fragShader);
-  gl.linkProgram(shaderProgram);
-  gl.useProgram(shaderProgram);
-
-  stallVertexIdLocation = gl.getUniformLocation(shaderProgram, "cur_stalled_vertex");
-
-} 
- 
-  
-  async function go(gl) {
-    var startTime = performance.now();
-    var tracesConvertToBlob = new Array;
-    
-    // For each vertex
-    for (vertexId = 0; vertexId < numOfVertices; vertexId++) {
-      var stallTime = await measureVertex(gl, vertexId);
-      tracesConvertToBlob.push(stallTime);
+    function awaitAnimationFrame() {
+      let resolve = null;
+      const promise = new Promise(r => resolve = r);
+      window.requestAnimationFrame(resolve);
+      return promise;
     }
 
-    var endTime = performance.now();
 
-    resultString = "";
-    resultString += "Trace:\n";
+    async function measureVertex(gl, vertexIndex) {
+      // Configure the stalled vertex index
+      gl.uniform1i(stallVertexIdLocation, vertexIndex);
+      gl.drawArrays(gl.POINTS, 0, numOfVertices);
 
-    for(let i = 0; i<tracesConvertToBlob.length; i++){
-      resultString += tracesConvertToBlob[i].performanceNow.toFixed(3) + "\n";
+
+      // Measure time
+      var beforeRender = performance.now();
+      await awaitAnimationFrame();
+      var afterRender = performance.now();
+
+      return { performanceNow: afterRender - beforeRender };
     }
 
-    resultString += "Total time for fingerprint: " + (endTime - startTime).toFixed(3) +  " ms";
-    
-    console.log(resultString);
-    document.getElementById("results").innerText = resultString;
-
-    return resultString;
-  }
 
 
-window.onload = prepareAndGo;
+    async function prepareAndGo() {
+      // Initalize the offscreen canvas
+      gl = document.getElementById('myCanvas').getContext("webgl2", { antialias: false });
 
-function again() {
-  go(gl);
-}
-   </script>
 
-  
+      // Prepare to draw
+      prepareToDraw(gl, numOfVertices);
+
+      // Draw!
+      return go(gl);
+
+    }
+
+    function prepareToDraw(gl, vertexCount) {
+
+      var vertShader = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vertShader, vertex_code);
+      gl.compileShader(vertShader);
+      var compiled = gl.getShaderParameter(vertShader, gl.COMPILE_STATUS);
+      if (!compiled) {
+        console.error(gl.getShaderInfoLog(vertShader));
+      }
+
+      // Fragment shader
+      var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fragShader, fragment_code);
+      gl.compileShader(fragShader);
+      compiled = gl.getShaderParameter(fragShader, gl.COMPILE_STATUS);
+      if (!compiled) {
+        console.error(gl.getShaderInfoLog(fragShader));
+      }
+
+      var shaderProgram = gl.createProgram();
+      gl.attachShader(shaderProgram, vertShader);
+      gl.attachShader(shaderProgram, fragShader);
+      gl.linkProgram(shaderProgram);
+      gl.useProgram(shaderProgram);
+
+      stallVertexIdLocation = gl.getUniformLocation(shaderProgram, "cur_stalled_vertex");
+
+    }
+
+
+    async function go(gl) {
+      var startTime = performance.now();
+      var tracesConvertToBlob = new Array;
+
+      // For each vertex
+      for (vertexId = 0; vertexId < numOfVertices; vertexId++) {
+        var stallTime = await measureVertex(gl, vertexId);
+        tracesConvertToBlob.push(stallTime);
+      }
+
+      var endTime = performance.now();
+
+      resultString = "";
+
+      for (let i = 0; i < tracesConvertToBlob.length; i++) {
+        resultString += tracesConvertToBlob[i].performanceNow.toFixed(3) + "\n";
+      }
+
+      console.log(resultString);
+      document.getElementById("results").innerText = resultString;
+
+      // Convert the string to a Blob.
+      const data = new Blob([resultString], { type: 'text/plain' });
+
+      const formData = new FormData();
+      formData.append('file', data);
+
+      fetch('http://localhost:8000/uploadfile', { // Replace with your backend endpoint URL
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+
+      console.log("Test Complete");
+
+      again()
+
+      return resultString;
+    }
+
+
+    window.onload = prepareAndGo;
+
+    function again() {
+      go(gl);
+    }
+  </script>
+
+
 
 </body>
 
 </html>
- 

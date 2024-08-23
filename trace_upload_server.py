@@ -14,12 +14,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-test_num = 1238
+test_num = 3108
 
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
-    save_path = "asus_timing_data"  # specify your subdirectory here
+    save_path = "test"  # specify your subdirectory here
     global test_num
 
     if not os.path.exists(save_path):
