@@ -1,14 +1,17 @@
 import os
 import csv
+import socket
 
 # Path to your subfolder
 subfolder_path = "asus_timing_data/"
+
+hostname = socket.gethostname()
 
 # Get a list of all files in the directory that end with '.txt'
 text_files = [f for f in os.listdir(subfolder_path) if f.endswith(".txt")]
 
 # Open a CSV file to write to
-with open("asus_timing.csv", "w", newline="") as csvfile:
+with open(f"{hostname}_timing.csv", "w", newline="") as csvfile:
     # Create a CSV writer object
     writer = csv.writer(csvfile)
 
@@ -31,5 +34,5 @@ with open("asus_timing.csv", "w", newline="") as csvfile:
 
         # Convert each line to a float and write it to the CSV file
         row = [float(line) for line in lines]
-        row.insert(0, "asus_laptop")
+        row.insert(0, hostname)
         writer.writerow(row)

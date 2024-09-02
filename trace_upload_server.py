@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 import os
 from shutil import copyfileobj
 from fastapi.middleware.cors import CORSMiddleware
+import socket
 
 app = FastAPI()
 
@@ -14,12 +15,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-test_num = 3108
+hostname = socket.gethostname()
+test_num = 0
 
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
-    save_path = "test"  # specify your subdirectory here
+    save_path = hostname  # specify your subdirectory here
     global test_num
 
     if not os.path.exists(save_path):
