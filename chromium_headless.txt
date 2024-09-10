@@ -1,0 +1,6 @@
+sudo chromium-browser --no-sandbox --headless --use-gl=egl
+
+chromium-browser --headless --use-gl=angle \
+   --use-angle=gl-egl --use-cmd-decoder=passthrough \
+
+firefox not working: https://bugzilla.mozilla.org/show_bug.cgi?id=1375585
