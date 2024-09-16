@@ -1,6 +1,10 @@
 sudo chromium-browser --no-sandbox --headless --use-gl=egl
+throws lots of errors
 
 chromium-browser --headless --use-gl=angle \
    --use-angle=gl-egl --use-cmd-decoder=passthrough \
+seems to work, but really slow? Eventually locks up pi?
+silently fails webglreport shows no webgl device.
 
 firefox not working: https://bugzilla.mozilla.org/show_bug.cgi?id=1375585
+with error: [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
